@@ -20,7 +20,7 @@ puts "Julius に接続しました"
 source = ""
 
 # 辞書
-dict = ["デジタルデータ", "数値化", "暗号", "圧縮", "音楽", "画像", "動画"]  
+dict = ["デジタルデータ", "数値化", "暗号", "圧縮", "音楽", "画像", "動画"]
 
 while true
   ret = IO::select([s])
@@ -29,17 +29,24 @@ while true
     if source[-2..source.size] == ".\n"
       source.gsub!(/\.\n/, "")
       xml = Nokogiri(source)
-      words = (xml/"RECOGOUT"/"SHYPO"/"WHYPO").inject("") {|ws, w| ws + w["WORD"] 
-      # 単語のみ取得
-      tango = 
+      words = (xml/"RECOGOUT"/"SHYPO"/"WHYPO").inject("") {|ws, w| ws + w["WORD"]} 
 
-      unless words == ""
-        puts "word:#{words}"
-      end
+      # 単語の表示
+      (xml/"RECOGOUT"/"SHYPO"/"WHYPO").each do |key|
+        puts "音声入力単語：" + key["WORD"]
+	dict.each do |dictword|
+	  puts "辞書にある単語：" + dictword + "," if key["WORD"] =~ /#{dictword}/
+	end
+     end
 
-      dict.each do |keyword|
-        print '辞書' + keyword + ',' if word =~ /#{keyword}/
-      end
+      # 文章の表示
+#      unless words == ""
+#        puts "#{words}"
+#      end
+
+#      dict.each do |keyword|
+#        puts "辞書にあります" + keyword + "," if tango["WORD"] =~ /#{keyword}/
+#      end
 
       source = ""
     end
