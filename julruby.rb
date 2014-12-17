@@ -20,39 +20,34 @@ puts "Julius に接続しました"
 source = ""
 
 # 辞書
-dict = ["デジタルデータ", "数値化", "暗号", "圧縮", "音楽", "画像", "動画"]
+dict = ["デジタル", "データ", "デジタル化", "数字", "映像", "コンピュータ", "情報", "情報化","ワープロ", "アナログ", "共通", "表す", "処理", "数値化", "暗号", "圧縮", "音楽", "画像", "動画"]
 
 while true
   ret = IO::select([s])
   ret[0].each do |sock|
     source += sock.recv(65535)
     if source[-2..source.size] == ".\n"
-      source.gsub!(/\.\n/, "")
-      xml = Nokogiri(source)
-      words = (xml/"RECOGOUT"/"SHYPO"/"WHYPO").inject("") {|ws, w| ws + w["WORD"]} 
-      lackword = Array.new
+       source.gsub!(/\.\n/, "")
+       xml = Nokogiri(source)
+       words = (xml/"RECOGOUT"/"SHYPO"/"WHYPO").inject("") {|ws, w| ws + w["WORD"]} 
 
-      # 文章の表示
-      unless words == ""
-        puts "#{words}"
-      end 
+       # 文章の表示
+       unless words == ""
+         # puts "#{words}"
+       end 
 
-      # 単語の表示
-      (xml/"RECOGOUT"/"SHYPO"/"WHYPO").each do |key|
-        # puts "音声入力単語：" + key["WORD"]
-	dict.each do |dictword|
-	  # puts "辞書にある単語：" + dictword + "," if key["WORD"] =~ /#{dictword}/
-	  lackword = dictword
-	end
-     end
+       # 不足単語の表示
+       (xml/"RECOGOUT"/"SHYPO"/"WHYPO").each do |key|
+         dict = dict - [key]
+	 print "不足単語の表示："
+	 dict.each do |lack|
+	   print lack
+	   print " "
+	 end
+	 print "\n\n"
+       end
 
-     puts lackward
-
-     dictword.each do |lack|
-	print "以下のワードが足りないですよ" + lack + "," if dictword != /#{lack}/
-     end
-
-      source = ""
+       source = ""
     end
   end
 end
