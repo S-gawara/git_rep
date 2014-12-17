@@ -7,13 +7,13 @@ require "nokogiri"
 
 s = nil
 until s
-  begin
-    s = TCPSocket.open("localhost", 10500)
-  rescue
-    STDERR.puts "Julius に接続失敗しました\n再接続を試みます"
-    sleep 10
-    retry
-  end
+    begin
+        s = TCPSocket.open("localhost", 10500)
+        rescue
+            STDERR.puts "Julius に接続失敗しました\n再接続を試みます"
+            sleep 10
+        retry
+    end
 end
 puts "Julius に接続しました"
 
@@ -31,32 +31,15 @@ while true
         xml = Nokogiri(source)
         words = (xml/"RECOGOUT"/"SHYPO"/"WHYPO").inject("") {|ws, w| ws + w["WORD"]} 
 
-        # 文章の表示
-        unless words == ""
-            # puts "#{words}"
+        (xml/"RECOGOUT"/"SHYPO"/"WHYPO").each do |key|
+	    # dict.each do |dictword|
+            #     puts "取得単語： " + dictword if key["WORD"] =~ /#{dictword}/
+	    #     print "\n"
+	    # end
+            print "不足単語： "
+	    print  dict = dict - [key["WORD"]]
+	    print "\n"
         end
-
-       # 取得単語の表示
-       # (xml/"RECOGOUT"/"SHYPO"/"WHYPO").each do |key|
-       #    print "登録した単語："
-       #    dict.each do |dictword|
-               # puts dictword + "," if key["WORD"] =~ /#{dictword}/
-       #       dict = dict - dictword if key["WORD"] =~ /#{dictword}/
-       #       puts dict
-       #    end
-       # print "\n"
-       # end
-
-       (xml/"RECOGOUT"/"SHYPO"/"WHYPO").each do |key|
-	   dict.each do |dictword|
-               puts "取得単語： " + dictword if key["WORD"] =~ /#{dictword}/
-	       print "\n"
-	   end
-           puts "不足単語： "
-	   dict = dict - [key["WORD"]]
-	   puts dict
-	   print "\n"
-       end
         source = ""
         end
     end
